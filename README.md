@@ -9,14 +9,7 @@ Drop into your project, make a new make target like:
     ##> help : Show this help text
     .PHONY: help
     help:
-    	@python scripts/makefile_self_document.py
-
-or if you include other Makefiles:
-
-    ##> help : Show this help text
-    .PHONY: help
-    help:
-    	@python scripts/makefile_self_document.py Makefile frontend/Makefile
+    	@python scripts/makefile_self_document.py $(MAKEFILE_LIST)
 
 This script scans the makefiles for:
 

@@ -25,17 +25,20 @@ import logging
 
 # mirrors salt.log
 logging.basicConfig(
-    level=logging.INFO,
-    stream=os.sys.stderr,
-    format="[%(levelname)-8s] %(message)s",
-    datefmt="%H:%M:%S",
+    level=logging.INFO, stream=os.sys.stderr, format="[%(levelname)-8s] %(message)s"
 )
 log = logging.getLogger(__name__)
 
-HERE = os.path.realpath(os.path.dirname(__file__))
 DEFAULT_MAKEFILE = os.path.join(os.getcwd(), "Makefile")
-TERM_COLORS = {"PURPLE": "\033[0;35m", "BLUE": "\033[0;34m", "LGRAY": "\033[0;37m", "NC": "\033[0m"}
+TERM_COLORS = {
+    "PURPLE": "\033[0;35m",
+    "BLUE": "\033[0;34m",
+    "LGRAY": "\033[0;37m",
+    "NC": "\033[0m",
+}
 TERM_NOCOLORS = {color: "" for color in TERM_COLORS}
+SELFUPDATE_URL = (
+    "https://github.com/jweede/makefile-pretty-help-script/raw/master/makefile_self_document.py")
 
 doc_lines_re = re.compile(
     r"^[#]{4}>?\s*(?P<header>.*?)\s*<?[#]*$"
@@ -45,6 +48,18 @@ doc_lines_re = re.compile(
 )
 header_fmt = "\n{c[PURPLE]}>> {0} <<{c[NC]}\n"
 cmd_fmt = "{c[LGRAY]}make {c[BLUE]}{0: <24}{c[NC]}{1}"
+
+
+def script_selfupdate():
+    """best effort self-updating"""
+    import requests
+
+    log.debug("Attempting self-update via %s", SELFUPDATE_URL)
+    this_script = os.path.realpath(__file__)
+    res = requests.get(SELFUPDATE_URL)
+    with open(this_script, "w") as fp:
+        fp.write(res.text)
+    log.info("Update complete.")
 
 
 def help_output(makefile_fp, colors=TERM_COLORS):
@@ -66,21 +81,40 @@ def help_output(makefile_fp, colors=TERM_COLORS):
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("makefile", nargs="*", default=(DEFAULT_MAKEFILE,))
 parser.add_argument(
-    "--no-color", action="store_false", dest="colorterm", help="disable colored output"
+    "makefile",
+    nargs="*",
+    default=(DEFAULT_MAKEFILE,),
+    help="List of makefiles to check. "
+    "Recommend using `$(MAKEFILE_LIST)` when embedding into your Makefile",
+)
+parser.add_argument(
+    "--no-color", action="store_false", dest="colorterm", help="disable colored output."
+)
+parser.add_argument(
+    "--update", action="store_true", help="update this script after running."
+)
+parser.add_argument(
+    "--debug", "-d", action="store_true", help="print extra debug output."
 )
 
 
 def main(argv=None):
     args = parser.parse_args(argv)
     colors = TERM_COLORS if args.colorterm else TERM_NOCOLORS
+    if args.debug:
+        log.setLevel(logging.DEBUG)
 
+    if not args.makefile:
+        log.warn("No Makefile?")
     for makefile in args.makefile:
         assert os.path.exists(makefile)
         with open(makefile, "r") as fp:
             for line in help_output(fp, colors):
                 print(line)
+
+    if args.update:
+        script_selfupdate()
 
 
 if __name__ == "__main__":
