@@ -25,7 +25,9 @@ import logging
 
 # mirrors salt.log
 logging.basicConfig(
-    level=logging.INFO, stream=os.sys.stderr, format="[%(levelname)-8s] %(message)s"
+    level=logging.INFO,
+    stream=os.sys.stderr,
+    format="[%(levelname)-8s] %(message)s",
 )
 log = logging.getLogger(__name__)
 
@@ -89,7 +91,10 @@ parser.add_argument(
     "Recommend using `$(MAKEFILE_LIST)` when embedding into your Makefile",
 )
 parser.add_argument(
-    "--no-color", action="store_false", dest="colorterm", help="disable colored output."
+    "--no-color",
+    action="store_false",
+    dest="colorterm",
+    help="disable colored output.",
 )
 parser.add_argument(
     "--update", action="store_true", help="update this script after running."
@@ -109,6 +114,7 @@ def main(argv=None):
         log.warn("No Makefile?")
     for makefile in args.makefile:
         assert os.path.exists(makefile)
+        log.debug("Scanning %s", makefile)
         with open(makefile, "r") as fp:
             for line in help_output(fp, colors):
                 print(line)
