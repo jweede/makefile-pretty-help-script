@@ -13,5 +13,5 @@ help:
 
 .PHONY: fmt  # auto-format with black
 fmt:
-	black -l 80 .
+	black .
 

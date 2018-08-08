@@ -23,24 +23,23 @@ import os
 import re
 import logging
 
-# mirrors salt.log
 logging.basicConfig(
-    level=logging.INFO,
-    stream=os.sys.stderr,
-    format="[%(levelname)-8s] %(message)s",
+    level=logging.INFO, format="[%(levelname)-8s] %(message)s", stream=os.sys.stderr
 )
 log = logging.getLogger(__name__)
 
 DEFAULT_MAKEFILE = os.path.join(os.getcwd(), "Makefile")
 TERM_COLORS = {
     "PURPLE": "\033[0;35m",
+    "GREEN": "\033[0;32m",
     "BLUE": "\033[0;34m",
     "LGRAY": "\033[0;37m",
     "NC": "\033[0m",
 }
 TERM_NOCOLORS = {color: "" for color in TERM_COLORS}
 SELFUPDATE_URL = (
-    "https://github.com/jweede/makefile-pretty-help-script/raw/master/makefile_self_document.py")
+    "https://github.com/jweede/makefile-pretty-help-script/raw/master/makefile_self_document.py"
+)
 
 doc_lines_re = re.compile(
     r"^[#]{4}>?\s*(?P<header>.*?)\s*<?[#]*$"
@@ -82,7 +81,9 @@ def help_output(makefile_fp, colors=TERM_COLORS):
         yield line
 
 
-parser = argparse.ArgumentParser(description=__doc__)
+parser = argparse.ArgumentParser(
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+)
 parser.add_argument(
     "makefile",
     nargs="*",
@@ -91,17 +92,10 @@ parser.add_argument(
     "Recommend using `$(MAKEFILE_LIST)` when embedding into your Makefile",
 )
 parser.add_argument(
-    "--no-color",
-    action="store_false",
-    dest="colorterm",
-    help="disable colored output.",
+    "--no-color", action="store_false", dest="colorterm", help="disable colored output."
 )
-parser.add_argument(
-    "--update", action="store_true", help="update this script after running."
-)
-parser.add_argument(
-    "--debug", "-d", action="store_true", help="print extra debug output."
-)
+parser.add_argument("--update", action="store_true", help="update this script after running.")
+parser.add_argument("--debug", "-d", action="store_true", help="print extra debug output.")
 
 
 def main(argv=None):
