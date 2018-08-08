@@ -2,6 +2,11 @@
 
 Basic python script that makes it easy to print pretty help text for your Makefile.
 
+## Installation
+
+    wget 'https://github.com/jweede/makefile-pretty-help-script/raw/master/makefile_self_document.py'
+    chmod +x makefile_self_document.py
+
 ## Usage
 
 Drop into your project, make a new make target like:
@@ -39,3 +44,7 @@ make docs-watch              launch a live-updating local docs server
 make test                    run tests
 
 ```
+
+## Self-update
+
+    ./makefile_self_document.py --update
